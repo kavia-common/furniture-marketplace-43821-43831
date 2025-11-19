@@ -3,9 +3,12 @@ from api.models import Product
 
 # PUBLIC_INTERFACE
 class Command(BaseCommand):
-    help = 'Seed the database with example products'
+    help = 'Seed the database with example furniture products (reset first)'
 
     def handle(self, *args, **kwargs):
+        # Wipe existing data (for dev/test idempotency)
+        Product.objects.all().delete()
+
         sample_products = [
             {
                 'name': 'Modern Sofa',
@@ -28,12 +31,30 @@ class Command(BaseCommand):
                 'description': 'Queen-sized bed frame in white finish.',
                 'stock': 7
             },
+            {
+                "name": "Minimalist Coffee Table",
+                "price": 199.99,
+                "image": "https://images.unsplash.com/photo-1512820790803-83ca734da794",
+                "description": "A sleek coffee table that fits any living room.",
+                "stock": 20,
+            },
+            {
+                "name": "Blue Accent Chair",
+                "price": 159.99,
+                "image": "https://images.unsplash.com/photo-1515378791036-0648a3ef77b2",
+                "description": "A pop of color and comfort for your home.",
+                "stock": 15,
+            },
+            {
+                "name": "Office Ergonomic Chair",
+                "price": 249.99,
+                "image": "https://images.unsplash.com/photo-1524758631624-e2822e304c36",
+                "description": "Comfort and style for your work from home setup.",
+                "stock": 25,
+            },
         ]
 
-        created = 0
         for pd in sample_products:
-            obj, was_created = Product.objects.get_or_create(name=pd['name'], defaults=pd)
-            if was_created:
-                created += 1
+            Product.objects.create(**pd)
 
-        self.stdout.write(self.style.SUCCESS(f'Seeded {created} products'))
+        self.stdout.write(self.style.SUCCESS(f'Seeded {len(sample_products)} products (reset performed)'))
